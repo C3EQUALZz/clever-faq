@@ -71,6 +71,6 @@ class DocumentService(DomainService):
         self._record_event(
             DocumentNameChangedEvent(
                 document_id=document.id,
-                new_document_name=document.name,
+                new_document_name=str(document.name),
             )
         )

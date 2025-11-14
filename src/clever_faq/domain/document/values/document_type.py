@@ -8,3 +8,5 @@ class DocumentType(StrEnum):
     HTML = "html"
     DOCX = "docx"
     DOC = "doc"
+    ODT = "odt"
+    PPTX = "pptx"
