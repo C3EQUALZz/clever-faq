@@ -1,0 +1,197 @@
+x-default: &default
+  restart: unless-stopped
+  networks:
+    - overlay
+
+x-healthcheck-interval: &hc-interval
+  interval: 30s
+  timeout: 60s
+  retries: 5
+  start_period: 10s
+
+x-redis-environment: &x-redis-environment
+  REDIS_PASSWORD: ${REDIS_PASSWORD}
+  REDIS_USER: ${REDIS_USER}
+  REDIS_USER_PASSWORD: ${REDIS_USER_PASSWORD}
+  REDIS_PORT: ${REDIS_PORT}
+  REDIS_CACHE_DB: ${REDIS_CACHE_DB}
+  REDIS_WORKER_DB: ${REDIS_WORKER_DB}
+  REDIS_MAX_CONNECTIONS: ${REDIS_MAX_CONNECTIONS}
+
+x-rabbit-environment: &x-rabbit-environment
+  RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+  RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+  RABBITMQ_PORT: ${RABBITMQ_PORT}
+  RABBITMQ_UI_PORT: ${RABBITMQ_UI_PORT}
+
+x-db-environment: &x-db-environment
+  POSTGRES_SSL_MODE: "disable"
+  POSTGRES_HOST: ${POSTGRES_HOST}
+  POSTGRES_PORT: ${POSTGRES_PORT}
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  POSTGRES_USER: ${POSTGRES_USER}
+
+x-minio-environment: &x-minio-environment
+  MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+  MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+  MINIO_IMAGES_BUCKET: ${MINIO_IMAGES_BUCKET}
+  MINIO_SCHEME: http
+  MINIO_PORT: ${MINIO_PORT}
+  MINIO_UI_PORT: ${MINIO_UI_PORT}
+  MINIO_SKIP_CLIENT: yes
+
+services:
+  chroma:
+    <<: *default
+    profiles: [ "api", "db" ]
+    image: chromadb/chroma:1.0.16
+    container_name: automatic_responses.chroma
+    hostname: automatic_responses.chroma
+    environment:
+      IS_PERSISTENT: TRUE
+      ANONYMIZED_TELEMETRY: FALSE
+      CHROMA_VECTOR_STORAGE: hnswlib
+    volumes:
+      - clever_faq.chroma.data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    ports:
+      - ${CHROMA_SERVER_HTTP_PORT}:${CHROMA_SERVER_HTTP_PORT}
+
+  redis:
+    <<: *default
+    profiles: [ "api", "worker", "cache" ]
+    image: redis:8.0.2-alpine
+    container_name: clever_faq.redis
+    hostname: clever_faq.redis
+    environment:
+      <<: *x-redis-environment
+    command: /bin/sh -cx "chmod +x /usr/local/bin/redis_entrypoint.sh && /usr/local/bin/redis_entrypoint.sh"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      <<: *hc-interval
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    volumes:
+      - clever_faqs.redis.data:/data
+      - ./deploy/dev/redis/redis_entrypoint.sh:/usr/local/bin/redis_entrypoint.sh
+
+  rabbitmq:
+    <<: *default
+    profiles: [ "api", "worker" ]
+    image: rabbitmq:4.0-management-alpine
+    container_name: clever_faq.rabbitmq
+    hostname: clever_faq.rabbitmq
+    expose:
+      # AMQP protocol port
+      - ${RABBITMQ_PORT}
+      # HTTP management UI
+      - ${RABBITMQ_UI_PORT}
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1024M
+        reservations:
+          cpus: '1'
+          memory: 512M
+    ports:
+      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
+      - ${RABBITMQ_UI_PORT}:${RABBITMQ_UI_PORT}
+    environment:
+      <<: *x-rabbit-environment
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log_levels [{connection,error},{default,error}]
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      <<: *hc-interval
+    volumes:
+      - clever_faq.rabbitmq.data:/var/lib/rabbitmq/:rw
+
+  postgres:
+    <<: *default
+    profiles: [ "api", "db" ]
+    container_name: automatic_responses.postgres
+    hostname: automatic_responses.postgres
+    image: postgres:16.10-alpine3.22
+    environment:
+      <<: *x-db-environment
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '1'
+          memory: 512M
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - clever_faq.postgres.data:/var/lib/postgresql/data
+      - ./deploy/dev/postgres/postgresql.conf:/etc/postgresql.conf
+      - ./deploy/dev/postgres/pg_hba.conf:/etc/pg_hba.conf
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+      <<: *hc-interval
+
+  minio:
+    <<: *default
+    image: quay.io/minio/minio:RELEASE.2025-03-12T18-04-18Z
+    container_name: clever_faq.minio
+    hostname: clever_faq.minio
+    ports:
+      - 127.0.0.1:${MINIO_PORT}:${MINIO_PORT}
+      - 127.0.0.1:${MINIO_UI_PORT}:${MINIO_UI_PORT}
+    environment:
+      <<: *x-minio-environment
+    entrypoint: >
+      /bin/sh -c '
+        isAlive() { curl -sf http://127.0.0.1:${MINIO_PORT}/minio/health/live; }    # check if Minio is alive
+        minio $0 "$@" --quiet & echo $! > /tmp/minio.pid                   # start Minio in the background
+        while ! isAlive; do sleep 0.1; done                                # wait until Minio is alive
+        mc alias set minio http://127.0.0.1:${MINIO_PORT} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} # setup Minio client
+        mc mb minio/${MINIO_FILES_BUCKET} || true                                    # create a test bucket
+        mc anonymous set public minio/${MINIO_FILES_BUCKET}                          # make the test bucket public
+        kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid             # stop Minio
+        while isAlive; do sleep 0.1; done                                  # wait until Minio is stopped
+        exec minio $0 "$@"                                                 # start Minio in the foreground
+      '
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
+        reservations:
+          cpus: '1'
+          memory: 256M
+    command: server /data --console-address :${MINIO_UI_PORT}
+    healthcheck:
+      test: "curl -k -f http://127.0.0.1:${MINIO_PORT}/minio/health/live || exit 1"
+      <<: *hc-interval
+    volumes:
+      - clever_faq.minio.data:/data
+
+volumes:
+  clever_faq.chroma.data: { }
+  clever_faq.redis.data: { }
+  clever_faq.rabbitmq.data: { }
+  clever_faq.postgres.data: { }
+  clever_faq.minio.data: { }
+
+networks:
+  overlay:
+    driver: bridge
