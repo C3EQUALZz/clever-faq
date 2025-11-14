@@ -23,7 +23,7 @@ default:
 @venv-sync:
     uv pip install -e ".[dev]"
 
-[doc("Run all containers in production version")]
+[doc("Run all containers version")]
 [group("infra")]
 @up:
   docker compose -f {{ DOCKER_COMPOSE_DEV }} --profile api up --build -d

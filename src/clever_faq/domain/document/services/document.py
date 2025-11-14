@@ -29,7 +29,7 @@ class DocumentService(DomainService):
         self._document_id_generator: Final[DocumentIDGenerator] = document_id_generator
 
     @overload
-    async def create_document(
+    def create_document(
         self,
         name: DocumentName,
         text: DocumentText,
@@ -37,11 +37,11 @@ class DocumentService(DomainService):
     ) -> Document: ...
 
     @overload
-    async def create_document(
+    def create_document(
         self, name: DocumentName, text: DocumentText, doc_type: DocumentType, document_id: DocumentID
     ) -> Document: ...
 
-    async def create_document(
+    def create_document(
         self,
         name: DocumentName,
         text: DocumentText,

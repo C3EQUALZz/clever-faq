@@ -42,11 +42,16 @@ class CreateDocumentCommandHandler:
         self._document_id_generator: Final[DocumentIDGenerator] = document_id_generator
 
     async def __call__(self, data: CreateDocumentCommand) -> CreateDocumentView:
-        logger.info("Starting add document from file %s", data.name)
+        logger.info("Starting add document %s", data.name)
 
+        logger.info("Started validating document with name: %s", data.name)
         file_name: DocumentName = DocumentName(data.name)
+        logger.info("Validated document name: %s", file_name)
+        logger.info("Started getting document type for processing, mime type: %s", data.mime_type)
         type_of_file: DocumentType = convert_mime_type_to_type_of_file(data.mime_type)
+        logger.info("Validated mime type: %s", type_of_file)
         document_id: DocumentID = self._document_id_generator()
+        logger.info("Generated document id %s", document_id)
 
         document_dto_for_save_in_storage: DocumentDTO = DocumentDTO(
             document_id=document_id,
@@ -55,14 +60,18 @@ class CreateDocumentCommandHandler:
             document_type=type_of_file,
         )
 
+        logger.info("Started adding document with id: %s to storage", document_id)
         await self._document_storage.add(
-            file_dto=document_dto_for_save_in_storage,
+            document=document_dto_for_save_in_storage,
         )
+        logger.info("Added document with id: %s to storage", document_id)
 
+        logger.info("Started generating task id for RAG for document with id: %s", document_id)
         task_id: TaskID = self._scheduler.make_task_id(
             key=TaskKey("retrieval_augmented_generation_document"),
             value=str(document_id),
         )
+        logger.info("Generated task id for processing: %s", task_id)
 
         background_tasks: set[Task[None]] = set()
 

@@ -1,13 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import NewType, Protocol
-from uuid import UUID
+from typing import Protocol
 
 from clever_faq.domain.document.values.document_id import DocumentID
 from clever_faq.domain.document.values.document_name import DocumentName
 from clever_faq.domain.document.values.document_type import DocumentType
-
-FileID = NewType("FileID", UUID)
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -20,7 +17,7 @@ class DocumentDTO:
 
 class DocumentStorage(Protocol):
     @abstractmethod
-    async def add(self, file_dto: DocumentDTO) -> None: ...
+    async def add(self, document: DocumentDTO) -> None: ...
 
     @abstractmethod
-    async def read_by_id(self, file_id: FileID) -> DocumentDTO | None: ...
+    async def read_by_id(self, document_id: DocumentID) -> DocumentDTO | None: ...
