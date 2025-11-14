@@ -30,3 +30,6 @@ class DomainFieldError(DomainError):
         - The default message from DomainError is usually sufficient,
           but can be overridden for specific field validation cases
     """
+
+
+class InconsistentTimeError(DomainFieldError): ...

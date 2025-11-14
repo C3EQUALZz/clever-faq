@@ -2,8 +2,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, TypeVar
 
-from clever_faq.domain.common.errors.base import DomainError
-from clever_faq.domain.common.errors.time_errors import InconsistentTimeError
+from clever_faq.domain.common.errors import DomainError, InconsistentTimeError
 
 OIDType = TypeVar("OIDType")
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 
-from clever_faq.domain.common.errors.base import DomainFieldError
+from clever_faq.domain.common.errors import DomainFieldError
 
 
 @dataclass(frozen=True, eq=True, unsafe_hash=True)
