@@ -28,13 +28,14 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "asgi-monitor>=0.6.0",
+    "asgi-monitor==0.6.0",
+    "bazario==0.4.2",
     "dishka==1.7.2",
     "fastapi==0.121.2",
-    "orjson>=3.11.4",
+    "orjson==3.11.4",
     "redis==7.0.1",
     "taskiq==0.11.20",
-    "uvicorn>=0.38.0",
+    "uvicorn==0.38.0",
     "uvloop==0.21.0; sys_platform != 'win32'",
 ]
 
