@@ -28,7 +28,10 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-
+    "dishka==1.7.2",
+    "fastapi==0.121.2",
+    "redis==7.0.1",
+    "taskiq==0.11.20",
 ]
 
 [project.optional-dependencies]
@@ -157,5 +160,3 @@ targets = "src"
 
 [tool.codespell]
 skip = "*.pyi,*.pyc,./site"
-
-
