@@ -4,6 +4,7 @@ from typing import Final
 from dishka import Provider, Scope
 from dishka.integrations.fastapi import FastapiProvider
 from sqlalchemy.ext.asyncio import AsyncSession
+from taskiq import AsyncBroker
 
 from clever_faq.application.commands.document.create_document import CreateDocumentCommandHandler
 from clever_faq.application.commands.document.retrieval_augmentation_for_document import (
@@ -64,6 +65,7 @@ def configs_provider() -> Provider:
     provider.from_context(SQLAlchemyConfig)
     provider.from_context(PostgresConfig)
     provider.from_context(RedisConfig)
+    provider.from_context(AsyncBroker)
     return provider
 
 

@@ -1,5 +1,5 @@
 from typing import Literal
-
+import os
 from pydantic import BaseModel, Field
 
 
@@ -101,10 +101,10 @@ class OpenAISettings(BaseModel):
         description="Override for OpenAI-compatible API base URL.",
     )
     embeddings: OpenAIEmbeddingsSettings = Field(
-        default_factory=OpenAIEmbeddingsSettings,
+        default_factory=lambda: OpenAIEmbeddingsSettings(**os.environ),
         description="Embedding-model specific settings.",
     )
     chat: OpenAIChatSettings = Field(
-        default_factory=OpenAIChatSettings,
+        default_factory=lambda: OpenAIChatSettings(**os.environ),
         description="Chat-model specific settings.",
     )

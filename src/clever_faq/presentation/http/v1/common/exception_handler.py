@@ -4,6 +4,7 @@ from types import MappingProxyType
 from typing import Any, Final
 
 import pydantic
+import tenacity
 from fastapi import FastAPI, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.requests import Request
@@ -75,6 +76,7 @@ class ExceptionHandler:
             RollbackError: status.HTTP_503_SERVICE_UNAVAILABLE,
             CacheError: status.HTTP_503_SERVICE_UNAVAILABLE,
             FileStorageError: status.HTTP_503_SERVICE_UNAVAILABLE,
+            tenacity.RetryError: status.HTTP_503_SERVICE_UNAVAILABLE,
         }
     )
 

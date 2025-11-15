@@ -41,10 +41,6 @@ async def create_document_handler(
         msg = "Unknown content type"
         raise BadFileFormatError(msg)
 
-    if not image.content_type.startswith("image/"):
-        msg = f"Invalid content type {image.content_type}"
-        raise BadFileFormatError(msg)
-
     letters: str = string.ascii_lowercase
     result_str: str = "".join(random.choice(letters) for _ in range(20))  # nosec B311
 

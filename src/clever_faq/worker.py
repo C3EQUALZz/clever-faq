@@ -11,7 +11,9 @@ from clever_faq.setup.bootstrap import (
 )
 from clever_faq.setup.config.asgi import ASGIConfig
 from clever_faq.setup.config.cache import RedisConfig
+from clever_faq.setup.config.chroma import ChromaDBConfig
 from clever_faq.setup.config.database import PostgresConfig, SQLAlchemyConfig
+from clever_faq.setup.config.openai import OpenAISettings
 from clever_faq.setup.config.s3 import S3Config
 from clever_faq.setup.config.settings import AppConfig
 from clever_faq.setup.ioc import setup_providers
@@ -46,6 +48,8 @@ def create_worker_taskiq_app() -> AsyncBroker:
         PostgresConfig: configs.postgres,
         S3Config: configs.s3,
         AsyncBroker: task_manager,
+        OpenAISettings: configs.openai,
+        ChromaDBConfig: configs.chroma,
     }
 
     container: AsyncContainer = make_async_container(*setup_providers(), context=context)
