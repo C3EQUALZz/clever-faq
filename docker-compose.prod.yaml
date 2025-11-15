@@ -16,6 +16,7 @@ x-redis-environment: &x-redis-environment
   REDIS_PORT: ${REDIS_PORT}
   REDIS_CACHE_DB: ${REDIS_CACHE_DB}
   REDIS_WORKER_DB: ${REDIS_WORKER_DB}
+  REDIS_SCHEDULE_SOURCE_DB: ${REDIS_SCHEDULE_SOURCE_DB}
   REDIS_MAX_CONNECTIONS: ${REDIS_MAX_CONNECTIONS}
 
 x-rabbit-environment: &x-rabbit-environment
@@ -57,6 +58,11 @@ x-app-environment: &x-app-environment
   RENDER_JSON_LOGS: False
   FASTAPI_DEBUG: True
   FASTAPI_ALLOW_CREDENTIALS: False
+  LANGSMITH_TRACING: ${LANGSMITH_TRACING}
+  LANGSMITH_API_KEY: ${LANGSMITH_API_KEY}
+  LANGSMITH_WORKSPACE_ID: ${LANGSMITH_WORKSPACE_ID}
+  OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
 
 x-minio-environment: &x-minio-environment
   MINIO_ROOT_USER: ${MINIO_ROOT_USER}
@@ -218,7 +224,7 @@ services:
     hostname: automatic_responses.api
     build:
       context: .
-      dockerfile: ./deploy/dev/automatic_responses/Dockerfile
+      dockerfile: ./deploy/prod/clever_faq/Dockerfile
     environment:
       <<: [
         *x-app-environment,
@@ -246,6 +252,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -257,11 +265,11 @@ services:
   worker:
     <<: *default
     profiles: [ "api", "scheduler" ]
-    container_name: pix_erase.worker
-    hostname: pix_erase.worker
+    container_name: clever_faq.worker
+    hostname: clever_faq.worker
     build:
       context: .
-      dockerfile: ./deploy/prod/pix_erase/Dockerfile
+      dockerfile: ./deploy/prod/clever_faq/Dockerfile
     environment:
       <<: [
         *x-db-environment,
@@ -285,8 +293,6 @@ services:
         reservations:
           cpus: '1.0'
           memory: 1024M
-    ports:
-      - "127.0.0.1:${PROMETHEUS_WORKER_SERVER_PORT}:${PROMETHEUS_WORKER_SERVER_PORT}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -294,15 +300,19 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      chroma:
+        condition: service_started
+      minio:
+        condition: service_healthy
 
   scheduler:
     <<: *default
     profiles: [ "api", "scheduler" ]
-    container_name: pix_erase.scheduler
-    hostname: pix_erase.scheduler
+    container_name: clever_faq.scheduler
+    hostname: clever_faq.scheduler
     build:
       context: .
-      dockerfile: ./deploy/prod/pix_erase/Dockerfile
+      dockerfile: ./deploy/prod/clever_faq/Dockerfile
     environment:
       <<: [
         *x-db-environment,
@@ -327,6 +337,10 @@ services:
       redis:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      chroma:
+        condition: service_started
+      minio:
         condition: service_healthy
 
 

@@ -1,6 +1,6 @@
 import os
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from clever_faq.setup.config.asgi import ASGIConfig
@@ -14,7 +14,7 @@ from clever_faq.setup.config.worker import TaskIQWorkerConfig
 
 
 class AppConfig(BaseModel):
-    load_dotenv(r"D:\Progrramming\PycharmProjects\clever-faq\.env")
+   #  load_dotenv(r"D:\Progrramming\PycharmProjects\clever-faq\.env")
 
     postgres: PostgresConfig = Field(
         default_factory=lambda: PostgresConfig(**os.environ),

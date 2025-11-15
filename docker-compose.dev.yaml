@@ -16,6 +16,7 @@ x-redis-environment: &x-redis-environment
   REDIS_PORT: ${REDIS_PORT}
   REDIS_CACHE_DB: ${REDIS_CACHE_DB}
   REDIS_WORKER_DB: ${REDIS_WORKER_DB}
+  REDIS_SCHEDULE_SOURCE_DB: ${REDIS_SCHEDULE_SOURCE_DB}
   REDIS_MAX_CONNECTIONS: ${REDIS_MAX_CONNECTIONS}
 
 x-rabbit-environment: &x-rabbit-environment

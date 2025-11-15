@@ -32,7 +32,7 @@ cd clever-faq
 
 cp .env.dist .env
 
-just up
+docker compose -f docker-compose.prod.yaml --profile api up --build -d
 ```
 
 > [!NOTE]
