@@ -31,5 +31,4 @@ async def get_chat_model(config: OpenAISettings) -> AsyncIterator[BaseChatModel]
         timeout=config.chat.timeout,
         max_retries=config.chat.max_retries,
         base_url=config.base_url,
-        response_format=config.chat.response_format,
     )

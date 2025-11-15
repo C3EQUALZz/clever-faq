@@ -46,8 +46,8 @@ services:
     <<: *default
     profiles: [ "api", "db" ]
     image: chromadb/chroma:1.0.16
-    container_name: automatic_responses.chroma
-    hostname: automatic_responses.chroma
+    container_name: clever_faq.chroma
+    hostname: clever_faq.chroma
     environment:
       IS_PERSISTENT: TRUE
       ANONYMIZED_TELEMETRY: FALSE

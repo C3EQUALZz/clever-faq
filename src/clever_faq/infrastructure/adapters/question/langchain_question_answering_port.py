@@ -53,6 +53,7 @@ class LangChainQuestionAnsweringPort(QuestionAnsweringPort):
             [
                 ("system", PROMPT_TO_LLM_RUSSIAN),
                 ("human", "{input}"),
+                ("human", "Контекст:\n{context}"),
             ]
         )
 
@@ -82,7 +83,7 @@ class LangChainQuestionAnsweringPort(QuestionAnsweringPort):
             answer = answer.replace("но я не нашел информации", "")
 
         message: Message = Message(answer.strip())
-        tokens: Tokens = Tokens(answer_from_llm["usage"]["total_tokens"])
+        tokens: Tokens = Tokens(self._large_learning_model.get_num_tokens(raw_answer))
 
         return MessageWithTokenDTO(
             message=message,

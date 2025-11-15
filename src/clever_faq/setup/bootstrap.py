@@ -17,6 +17,7 @@ from clever_faq.presentation.http.v1.common.routes import healthcheck, index
 from clever_faq.presentation.http.v1.middlewares.client_cache import ClientCacheMiddleware
 from clever_faq.presentation.http.v1.middlewares.logs import LoggingMiddleware
 from clever_faq.presentation.http.v1.routes.documents import documents_router
+from clever_faq.presentation.http.v1.routes.questions import questions_router
 from clever_faq.setup.config.asgi import ASGIConfig
 from clever_faq.setup.config.cache import RedisConfig
 from clever_faq.setup.config.rabbit import RabbitConfig
@@ -99,6 +100,7 @@ def setup_http_routes(app: FastAPI, /) -> None:
 
     router_v1: APIRouter = APIRouter(prefix="/v1")
     router_v1.include_router(documents_router)
+    router_v1.include_router(questions_router)
 
     app.include_router(router_v1)
 

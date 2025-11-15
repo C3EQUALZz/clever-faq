@@ -60,7 +60,7 @@ test = [
     "pytest==8.4.2",
     "pytest-asyncio==1.2.0",
     "httpx==0.28.1",
-    "testcontainers[postgres,redis]==4.10.0"
+    "testcontainers[minio,postgres,rabbitmq,redis,chroma]==4.10.0"
 ]
 lint = [
     "ruff==0.14.0",
@@ -90,6 +90,51 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 markers = ["value_objects"]
+env = [
+    "LANGSMITH_TRACING=false",
+    "LANGSMITH_API_KEY=fasdfafwqe",
+    "LANGSMITH_WORKSPACE_ID=qweqwjek1j2",
+    "OPENAI_API_KEY=2312edqdqwwdwqqwd",
+    "MINIO_HOST=localhost",
+    "MINIO_PORT=9000",
+    "MINIO_ROOT_USER=minioadmin",
+    "MINIO_ROOT_PASSWORD=minioadmin",
+    "MINIO_FILES_BUCKET=fiieir",
+    "POSTGRES_HOST=localhost",
+    "POSTGRES_USER=postgres",
+    "POSTGRES_PASSWORD=postgres",
+    "POSTGRES_DB=testdatabase",
+    "POSTGRES_PORT=5432",
+    "POSTGRES_DRIVER=asyncpg",
+    "DB_POOL_PRE_PING=True",
+    "DB_POOL_RECYCLE=3600",
+    "DB_POOL_SIZE=50",
+    "DB_POOL_MAX_OVERFLOW=25",
+    "DB_ECHO=False",
+    "DB_AUTO_FLUSH=False",
+    "DB_EXPIRE_ON_COMMIT=False",
+    "DB_DEBUG=True",
+    "DB_FUTURE=True",
+    "RABBITMQ_HOST=localhost",
+    "RABBITMQ_PORT=5672",
+    "RABBITMQ_UI_PORT=15672",
+    "RABBITMQ_DEFAULT_USER=guest",
+    "RABBITMQ_DEFAULT_PASS=guest",
+    "UVICORN_HOST=0.0.0.0",
+    "UVICORN_PORT=8080",
+    "REDIS_HOST=localhost",
+    "REDIS_PASSWORD=default",
+    "REDIS_USER=default",
+    "REDIS_USER_PASSWORD=default",
+    "REDIS_PORT=6379",
+    "REDIS_CACHE_DB=0",
+    "REDIS_WORKER_DB=1",
+    "REDIS_SCHEDULE_SOURCE_DB=2",
+    "REDIS_MAX_CONNECTIONS=20",
+    "CHROMA_SERVER_HOST=localhost",
+    "CHROMA_SERVER_HTTP_HOST=localhost",
+    "CHROMA_SERVER_HTTP_PORT=8000"
+]
 
 [tool.basedpyright]
 include = ["src", "tests"]
@@ -140,6 +185,7 @@ ignore = ["D", "CPY001", "A005", "TRY003", "COM812", "FBT001", "FBT003", "PLR091
 [tool.ruff.lint.per-file-ignores]
 "src/clever_faq/infrastructure/persistence/migrations/**" = ["ERA001", "INP001", "E501", "PLC0415"]
 "src/clever_faq/presentation/http/v1/routes/documents/create_documents/handlers.py" = ["S311"]
+"tests/**" = ["S101", "PLR2004", "S106"]
 
 [tool.ruff.format]
 docstring-code-format = true

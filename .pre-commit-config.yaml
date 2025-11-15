@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: detect-secrets
         args: [".secrets.baseline"]
-        exclude: ^\.env\.dist$|^alembic\.ini$
+        exclude: ^\.env\.dist$|^alembic\.ini$|^pyproject\.toml$|test_*|
 
   - repo: local
     hooks:

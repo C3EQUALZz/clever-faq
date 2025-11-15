@@ -72,10 +72,6 @@ class OpenAIChatSettings(BaseModel):
         ge=0,
         description="Number of retries for chat requests.",
     )
-    response_format: Literal["text", "json_object"] = Field(
-        default="text",
-        description="Desired response serialization format.",
-    )
 
 
 class OpenAISettings(BaseModel):

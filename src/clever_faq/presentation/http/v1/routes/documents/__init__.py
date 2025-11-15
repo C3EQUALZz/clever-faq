@@ -8,7 +8,7 @@ from clever_faq.presentation.http.v1.routes.documents.create_documents.handlers 
 
 documents_router: Final[APIRouter] = APIRouter(
     route_class=DishkaRoute,
-    tags=["Documents"],
+    tags=["Document"],
     prefix="/documents",
 )
 

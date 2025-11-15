@@ -18,7 +18,7 @@ from clever_faq.presentation.http.v1.routes.questions.ask_question.schemas impor
 if TYPE_CHECKING:
     from clever_faq.application.common.views.questions import AnswerTheQuestionView
 
-ask_question_router: Final[APIRouter] = APIRouter(route_class=DishkaRoute, tags=["Questions"])
+ask_question_router: Final[APIRouter] = APIRouter(route_class=DishkaRoute, tags=["Question"])
 
 
 @ask_question_router.post(

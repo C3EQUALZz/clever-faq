@@ -118,3 +118,41 @@ HTTP → Use Case
         Use Case ← Repository
   HTTP ← Use Casearly identical, differing mainly in naming conventions.
 ```
+
+### Examples
+
+Ask the model:
+
+![img.png](docs/images/1.png)
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/questions/ask/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "question": "Что такое SmartTask REST API?"
+}'
+```
+
+Add document to the Rag:
+
+![img.png](docs/images/3.png)
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8080/api/v1/documents/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'image=@11_Laboratornaja_rabota_Mandatnoe_i_diskretsionnoe_razgranichenie_2.pdf;type=application/pdf'
+```
+
+For tracing this app uses `Langsmith`, traces example:
+
+![img.png](docs/images/2.png)
+
+For running tests use this command:
+
+```bash
+just test
+```
