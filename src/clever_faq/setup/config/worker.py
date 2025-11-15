@@ -2,8 +2,6 @@ from typing import Final
 
 from pydantic import BaseModel, Field, field_validator
 
-from clever_faq.setup.config.consts import PORT_MAX, PORT_MIN
-
 RETRY_COUNT_MIN: Final[int] = 0
 DELAY_MIN: Final[int] = 0
 MAX_DELAY_COMPONENT_MIN: Final[int] = 1
@@ -18,15 +16,6 @@ class TaskIQWorkerConfig(BaseModel):
     durable_queue: bool = Field(default=True, description="Create durable queue for tasks or not")
     durable_exchange: bool = Field(default=True, description="Create exchange for tasks or not")
     declare_exchange: bool = Field(default=True, description="Declare exchange for tasks or not")
-
-    prometheus_server_address: str = Field(
-        alias="PROMETHEUS_WORKER_SERVER_HOST",
-        description="Taskiq prometheus server address"
-    )
-    prometheus_server_port: int = Field(
-        alias="PROMETHEUS_WORKER_SERVER_PORT",
-        description="Taskiq prometheus server port"
-    )
 
     @field_validator("default_retry_count")
     @classmethod
@@ -52,14 +41,5 @@ class TaskIQWorkerConfig(BaseModel):
         if v < MAX_DELAY_COMPONENT_MIN:
             raise ValueError(
                 f"max_delay_component must be at least {MAX_DELAY_COMPONENT_MIN} seconds, got {v}."
-            )
-        return v
-
-    @field_validator("prometheus_server_port")
-    @classmethod
-    def validate_prometheus_server_port(cls, v: int) -> int:
-        if not PORT_MIN <= v <= PORT_MAX:
-            raise ValueError(
-                f"PROMETHEUS_WORKER_SERVER_PORT must be between {PORT_MIN} and {PORT_MAX}, got {v}."
             )
         return v

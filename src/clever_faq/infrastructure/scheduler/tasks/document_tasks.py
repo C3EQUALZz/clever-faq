@@ -3,7 +3,7 @@ from typing import Annotated, Final
 
 from dishka import FromDishka
 from dishka.integrations.taskiq import inject
-from taskiq import Context, TaskiqDepends
+from taskiq import AsyncBroker, Context, TaskiqDepends
 from taskiq.depends.progress_tracker import ProgressTracker, TaskState
 
 from clever_faq.application.commands.document.retrieval_augmentation_for_document import (
@@ -61,3 +61,15 @@ async def retrieval_augmentation_for_document_task(
         logger.exception("App error was occurred")
         await progress_tracker.set_progress(state=TaskState.FAILURE)
         context.reject()
+
+
+def setup_documents_task(broker: AsyncBroker) -> None:
+    logger.info("Setup tasks")
+
+    broker.register_task(
+        func=retrieval_augmentation_for_document_task,
+        retry_on_error=True,
+        max_retries=3,
+        delay=15,
+        task_name="retrieval_augmented_generation_document",
+    )

@@ -11,7 +11,7 @@ class S3Config(BaseModel):
     signature_version: str = "s3v4"
     region_name: str = "us-east-1"
 
-    images_bucket_name: str = Field(..., alias="MINIO_IMAGES_BUCKET")
+    documents_bucket_name: str = Field(..., alias="MINIO_DOCUMENTS_BUCKET")
 
     @field_validator("port")
     @classmethod
