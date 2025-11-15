@@ -114,7 +114,7 @@ services:
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
     volumes:
-      - clever_faqs.redis.data:/data
+      - clever_faq.redis.data:/data
       - ./deploy/prod/redis/redis_entrypoint.sh:/usr/local/bin/redis_entrypoint.sh
 
   rabbitmq:

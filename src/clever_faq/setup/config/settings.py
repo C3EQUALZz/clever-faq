@@ -3,16 +3,16 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
-from clever_faq.config.asgi import ASGIConfig
-from clever_faq.config.cache import RedisConfig
-from clever_faq.config.database import PostgresConfig, SQLAlchemyConfig
-from clever_faq.config.rabbit import RabbitConfig
-from clever_faq.config.s3 import S3Config
-from clever_faq.config.worker import TaskIQWorkerConfig
+from clever_faq.setup.config.asgi import ASGIConfig
+from clever_faq.setup.config.cache import RedisConfig
+from clever_faq.setup.config.database import PostgresConfig, SQLAlchemyConfig
+from clever_faq.setup.config.rabbit import RabbitConfig
+from clever_faq.setup.config.s3 import S3Config
+from clever_faq.setup.config.worker import TaskIQWorkerConfig
 
 
 class AppConfig(BaseModel):
-    # load_dotenv(r"D:\PycharmProjects\PixErase\backend\.env")
+    load_dotenv(r"D:\Progrramming\PycharmProjects\clever-faq\.env")
 
     postgres: PostgresConfig = Field(
         default_factory=lambda: PostgresConfig(**os.environ),

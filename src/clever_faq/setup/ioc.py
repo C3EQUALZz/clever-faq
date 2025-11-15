@@ -48,6 +48,7 @@ from clever_faq.infrastructure.persistence.provider import (
     get_vector_store,
 )
 from clever_faq.infrastructure.scheduler.task_iq_task_scheduler import TaskIQTaskScheduler
+from clever_faq.setup.bootstrap import setup_schedule_source
 from clever_faq.setup.config.asgi import ASGIConfig
 from clever_faq.setup.config.cache import RedisConfig
 from clever_faq.setup.config.chroma import ChromaDBConfig
@@ -99,6 +100,7 @@ def gateways_provider() -> Provider:
 
 def application_ports_provider() -> Provider:
     provider: Final[Provider] = Provider(scope=Scope.REQUEST)
+    provider.provide(source=setup_schedule_source, scope=Scope.APP)
     provider.provide(LangChainQuestionAnsweringPort, provides=QuestionAnsweringPort)
     provider.provide(TaskIQTaskScheduler, provides=TaskScheduler)
     provider.provide(get_file_processor_factory)
