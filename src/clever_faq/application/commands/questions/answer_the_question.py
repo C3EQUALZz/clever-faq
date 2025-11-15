@@ -8,6 +8,7 @@ from clever_faq.application.common.ports.question.question_answering_port import
     QuestionAnsweringPort,
 )
 from clever_faq.application.common.ports.transaction_manager import TransactionManager
+from clever_faq.application.common.views.questions import AnswerTheQuestionView
 from clever_faq.domain.dialog.services.dialog_service import DialogService
 from clever_faq.domain.dialog.values.message import Message
 
@@ -36,7 +37,7 @@ class AnswerTheQuestionCommandHandler:
         self._dialog_gateway: Final[DialogCommandGateway] = dialog_gateway
         self._transaction_manager: Final[TransactionManager] = transaction_manager
 
-    async def __call__(self, data: AnswerTheQuestionCommand) -> None:
+    async def __call__(self, data: AnswerTheQuestionCommand) -> AnswerTheQuestionView:
         logger.info("Started answering question: %s", data.question)
 
         logger.info("Started validating question: %s", data.question)
@@ -66,3 +67,7 @@ class AnswerTheQuestionCommandHandler:
         await self._transaction_manager.commit()
 
         logger.info("Finished answering question: %s", data.question)
+
+        return AnswerTheQuestionView(
+            answer=answer_on_question.message.value,
+        )

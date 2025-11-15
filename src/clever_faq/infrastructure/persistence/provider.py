@@ -4,6 +4,9 @@ from typing import Final
 
 from aioboto3 import Session
 from aiobotocore.client import AioBaseClient
+from langchain_chroma import Chroma
+from langchain_core.embeddings import Embeddings
+from langchain_core.vectorstores import VectorStore
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -11,6 +14,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from clever_faq.setup.config.chroma import ChromaDBConfig
 from clever_faq.setup.config.database import (
     PostgresConfig,
     SQLAlchemyConfig,
@@ -128,3 +132,13 @@ async def get_s3_session(s3_config: S3Config) -> AsyncIterator[Session]:
 async def get_s3_client(session: Session, s3_config: S3Config) -> AsyncIterator[AioBaseClient]:
     async with session.client("s3", endpoint_url=s3_config.uri, use_ssl=False) as s3:
         yield s3
+
+
+async def get_vector_store(config: ChromaDBConfig, embedding_function: Embeddings) -> AsyncIterator[VectorStore]:
+    yield Chroma(
+        host=config.host,
+        port=config.port,
+        ssl=False,
+        embedding_function=embedding_function,
+        collection_metadata={"hnsw:space": "cosine"},
+    )

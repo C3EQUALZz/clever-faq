@@ -35,14 +35,19 @@ dependencies = [
     "dishka==1.7.2",
     "fastapi==0.121.2",
     "langchain==1.0.5",
-    "langchain-chroma>=1.0.0",
-    "langchain-experimental>=0.4.0",
+    "langchain-chroma==1.0.0",
+    "langchain-experimental==0.4.0",
+    "langchain-openai==1.0.3",
     "langsmith==0.4.42",
+    "odfpy==1.4.1",
     "orjson==3.11.4",
+    "pdfplumber==0.11.8",
     "python-docx==1.2.0",
+    "python-multipart>=0.0.20",
+    "python-pptx>=1.0.2",
     "redis==6.4.0",
     "taskiq==0.11.20",
-    "taskiq-aio-pika>=0.4.4",
+    "taskiq-aio-pika==0.4.4",
     "taskiq-redis==1.1.2",
     "uvicorn==0.38.0",
     "uvloop==0.21.0; sys_platform != 'win32'",
@@ -133,6 +138,7 @@ ignore = ["D", "CPY001", "A005", "TRY003", "COM812", "FBT001", "FBT003", "PLR091
 
 [tool.ruff.lint.per-file-ignores]
 "src/clever_faq/infrastructure/persistence/migrations/**" = ["ERA001", "INP001", "E501", "PLC0415"]
+"src/clever_faq/presentation/http/v1/routes/documents/create_documents/handlers.py" = ["S311"]
 
 [tool.ruff.format]
 docstring-code-format = true

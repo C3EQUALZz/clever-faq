@@ -10,13 +10,21 @@ from fastapi.requests import Request
 from fastapi.responses import ORJSONResponse
 
 from clever_faq.application.errors.base import ApplicationError
+from clever_faq.application.errors.document import DocumentNotFoundError, UnknownMimeTypeError
 from clever_faq.domain.common.errors import (
     AppError,
     DomainError,
     DomainFieldError,
+    InconsistentTimeError,
 )
+from clever_faq.domain.dialog.errors import BadMessageError
+from clever_faq.domain.document.errors import BadDocumentNameError, BadDocumentTextError
 from clever_faq.infrastructure.errors.base import InfrastructureError
-from clever_faq.infrastructure.errors.persistence import EntityAddError, RepoError, RollbackError
+from clever_faq.infrastructure.errors.cache import CacheError
+from clever_faq.infrastructure.errors.file import CantReadFileError
+from clever_faq.infrastructure.errors.persistence import EntityAddError, FileStorageError, RepoError, RollbackError
+from clever_faq.presentation.errors.base import PresentationError
+from clever_faq.presentation.errors.document import BadFileFormatError
 
 logger: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -37,10 +45,19 @@ class ExceptionHandler:
         {
             # 400
             DomainFieldError: status.HTTP_400_BAD_REQUEST,
+            BadFileFormatError: status.HTTP_400_BAD_REQUEST,
+            BadDocumentNameError: status.HTTP_400_BAD_REQUEST,
+            BadDocumentTextError: status.HTTP_400_BAD_REQUEST,
+            ValueError: status.HTTP_400_BAD_REQUEST,
+            BadMessageError: status.HTTP_400_BAD_REQUEST,
+            InconsistentTimeError: status.HTTP_400_BAD_REQUEST,
             # 401
             # 403
             # 415
+            CantReadFileError: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            UnknownMimeTypeError: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             # 404
+            DocumentNotFoundError: status.HTTP_404_NOT_FOUND,
             # 408
             # 409
             EntityAddError: status.HTTP_409_CONFLICT,
@@ -52,9 +69,12 @@ class ExceptionHandler:
             InfrastructureError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             AppError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             Exception: status.HTTP_500_INTERNAL_SERVER_ERROR,
+            PresentationError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             # 503
             RepoError: status.HTTP_503_SERVICE_UNAVAILABLE,
             RollbackError: status.HTTP_503_SERVICE_UNAVAILABLE,
+            CacheError: status.HTTP_503_SERVICE_UNAVAILABLE,
+            FileStorageError: status.HTTP_503_SERVICE_UNAVAILABLE,
         }
     )
 

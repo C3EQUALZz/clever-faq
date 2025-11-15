@@ -31,6 +31,11 @@ class CreateDocumentCommand:
 
 @final
 class CreateDocumentCommandHandler:
+    """
+    Async creation for document for RAG.
+    Returns info about task id and id for document.
+    """
+
     def __init__(
         self,
         document_id_generator: DocumentIDGenerator,

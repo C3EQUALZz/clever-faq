@@ -3,7 +3,7 @@ from functools import lru_cache
 from types import TracebackType
 from typing import Any, Final
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from taskiq import AsyncBroker, ScheduleSource, SmartRetryMiddleware, TaskiqScheduler, async_shared_broker
 from taskiq.schedule_sources import LabelScheduleSource
@@ -13,8 +13,10 @@ from taskiq_redis import ListRedisScheduleSource, RedisAsyncResultBackend
 from clever_faq.infrastructure.persistence.models.dialog import map_dialog_table
 from clever_faq.infrastructure.scheduler.tasks.document_tasks import setup_documents_task
 from clever_faq.presentation.http.v1.common.exception_handler import ExceptionHandler
+from clever_faq.presentation.http.v1.common.routes import healthcheck, index
 from clever_faq.presentation.http.v1.middlewares.client_cache import ClientCacheMiddleware
 from clever_faq.presentation.http.v1.middlewares.logs import LoggingMiddleware
+from clever_faq.presentation.http.v1.routes.documents import documents_router
 from clever_faq.setup.config.asgi import ASGIConfig
 from clever_faq.setup.config.cache import RedisConfig
 from clever_faq.setup.config.rabbit import RabbitConfig
@@ -80,6 +82,25 @@ def setup_http_middlewares(app: FastAPI, /, api_config: ASGIConfig) -> None:
     )
     app.add_middleware(ClientCacheMiddleware, max_age=60)  # type: ignore[arg-type, unused-ignore]
     app.add_middleware(LoggingMiddleware)  # type: ignore[arg-type, unused-ignore]
+
+
+def setup_http_routes(app: FastAPI, /) -> None:
+    """
+    Registers all routers for FastAPI application
+
+    Args:
+        app: FastAPI application
+
+    Returns:
+        None
+    """
+    app.include_router(index.router)
+    app.include_router(healthcheck.router)
+
+    router_v1: APIRouter = APIRouter(prefix="/v1")
+    router_v1.include_router(documents_router)
+
+    app.include_router(router_v1)
 
 
 def setup_task_manager(
