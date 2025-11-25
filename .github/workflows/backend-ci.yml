@@ -76,7 +76,7 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
-          cache-dependency-glob: "backend/pyproject.toml"
+          cache-dependency-glob: "pyproject.toml"
 
       - name: Install dev dependencies
         run: uv pip install --system -e ".[dev]"
