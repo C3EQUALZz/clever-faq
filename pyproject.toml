@@ -52,6 +52,7 @@ dependencies = [
     "taskiq-redis==1.1.2",
     "uvicorn==0.38.0",
     "uvloop==0.21.0; sys_platform != 'win32'",
+    "vkbottle>=4.6.2",
 ]
 
 [project.optional-dependencies]
